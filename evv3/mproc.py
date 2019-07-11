@@ -31,6 +31,13 @@ class MprocModel:
         """
         self.sources.append(src)
 
+    def source(self, gen):
+        """Decorator for adding a source to model"""
+        def start(*args, **kwargs):
+            src = gen(*args, **kwargs)
+            self.add_source(src)
+        return start
+
     def add_actor(self,act):
         """ Add an actor that will be called after every
         reducer rerturns an action
@@ -41,6 +48,9 @@ class MprocModel:
         :type act: callable
         """
         self.actors.append(act)
+
+    # for decorator use
+    actor = add_actor
 
     def add_reducer(self, reducer , subscribe=[]):
         """ Add a reducer that subscribes to events
@@ -57,6 +67,12 @@ class MprocModel:
         for t in subscribe:
             self.reducers.setdefault(t,[])
             self.reducers[t].append(reducer)
+
+    def reducer(self, subscribe=[]):
+        def decor(func):
+            print("decor", func)
+            self.add_reducer(func, subscribe=subscribe)
+        return decor
 
     def start(self):
         """

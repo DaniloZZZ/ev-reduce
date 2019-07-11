@@ -1,12 +1,7 @@
 import evv3 as ev3
 
-def stdin_source():
-    while True:
-        ev = (
-            'stdin',
-            input('>')
-        )
-        yield ev
+ev = ev3.MprocModel()
+
 
 def reducer_cumsum(event, data):
     """ Parse int from the input then add to 'cumsum data' """
@@ -23,12 +18,14 @@ def reducer_cumsum(event, data):
 
     return ("SEND",f"Sum is {data['cumsum']}"), data
 
+@ev.reducer( subscribe=['stdin'] )
 def reducer_overflow(event, data):
     data.setdefault('cumsum',0)
     threshhold = 20
     if data['cumsum'] > threshhold:
         return ("OVERFLOW",""), data
 
+@ev.actor
 def actor(action):
     act_type = action[0]
     if act_type=='ERROR':
@@ -41,12 +38,18 @@ def actor(action):
     else:
         return -1
 
+@ev.source
+def stdin_source():
+    while True:
+        ev = (
+            'stdin',
+            input('>')
+        )
+        yield ev
 
-ev = ev3.MprocModel()
-ev.add_source( stdin_source() )
-ev.add_actor( actor )
+stdin_source()
 
+# could use decorator too
 ev.add_reducer( reducer_cumsum , subscribe=['stdin'])
-ev.add_reducer( reducer_overflow , subscribe=['stdin'])
 
 ev.start()
