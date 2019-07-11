@@ -18,7 +18,7 @@ class MprocModel:
     def __init__(self):
         self.sources = []
         self.reducers = {}
-        self.actors = []
+        self.actors = {}
         self.data = {}
         self.to_reducers, self.from_source = mpc.Pipe()
         self.from_reducers, self.to_actions = mpc.Pipe()
@@ -38,19 +38,26 @@ class MprocModel:
             self.add_source(src)
         return start
 
-    def add_actor(self,act):
+    def add_actor(self, label, act):
         """ Add an actor that will be called after every
         reducer rerturns an action
+
+	:param label: A label that reducer return
+	:type label: str
 
         :param act: a callable that takes Action and returns None if\
                 the action succeded. Otherviwse an ev-red.Error event \
                 will be fired with data returned
         :type act: callable
+
         """
-        self.actors.append(act)
+        self.actors[label] = act
 
     # for decorator use
-    actor = add_actor
+    def actor(self, label):
+        def decor(func):
+            self.add_actor(label, func)
+        return decor
 
     def add_reducer(self, reducer , subscribe=[]):
         """ Add a reducer that subscribes to events
@@ -102,7 +109,6 @@ class MprocModel:
             for ev in gen_src:
                 self._emit(ev)
 
-
         emitter = Thread( 
             target=emitter_loop
         )
@@ -120,11 +126,14 @@ class MprocModel:
         self.to_reducers.send(ev)
 
     def _exec_act(self,act):
-        for a in self.actors:
-            result = a(act)
+        label = act[0]
+        action = self.actors.get(label)
+        if action is None:
+            print("Unknown label occured")
+        else:
+            result = action(act)
             if result is not None:
                 print("evv3: action returned an error", result)
-
 
     def _dispatch(self,act):
         self.to_actions.send(act)

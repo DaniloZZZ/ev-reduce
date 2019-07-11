@@ -27,12 +27,21 @@ def reducer_overflow(event, data):
     if data['cumsum'] > threshhold:
         return ("OVERFLOW",""), data
 
-ev.actor( _act.actor )
+
+@ev.actor('ERROR')
+def err(act):
+    print("There was an error. Please enter text")
+
+@ev.actor('OVERFLOW')
+def overf(act):
+    print("Overflow buddy:(")
+
+ev.actor('SEND')( _act.printer)
 
 ev.source( _src.stdin )()
-
 
 # could use decorator too
 ev.add_reducer( reducer_cumsum , subscribe=['stdin'])
 
 ev.start()
+
