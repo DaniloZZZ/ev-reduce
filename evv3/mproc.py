@@ -1,6 +1,7 @@
 import multiprocessing as mpc
 from threading import Thread
 from itertools import chain
+import time
 
 
 def _pipe_reader(pipe_end):
@@ -114,6 +115,8 @@ class MprocModel:
         def emitter_loop():
             for ev in gen_src:
                 self._emit(ev)
+                # allow other threads
+                time.sleep(0.)
             print("#Emitter exited. Emitting stop signal")
             self._emit(("_stop",''))
 
@@ -125,6 +128,7 @@ class MprocModel:
         while True:
             act = self.from_reducers.recv()
             result = self._exec_act(act)
+            time.sleep(0)
             if result=='_cmd_stop':break
 
         p.terminate()

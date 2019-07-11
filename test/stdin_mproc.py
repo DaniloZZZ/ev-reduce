@@ -21,7 +21,7 @@ def reducer_cumsum(event, data):
 def test_counter():
     _input_mock.sequence([
         'hi','13','213','-214','hd'
-    ])
+    ]*10)
     ev = ev3.MprocModel()
 
     @ev.reducer( subscribe=['stdin'] )
