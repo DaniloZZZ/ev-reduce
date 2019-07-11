@@ -1,4 +1,5 @@
 import multiprocessing as mpc
+from threading import Thread
 from itertools import chain
 
 
@@ -81,15 +82,23 @@ class MprocModel:
         p.start()
 
         gen_src = chain(*self.sources)
-        for ev in gen_src:
-            self._emit(ev)
-            # wait for action from reducers
-            wait= 0.1
-            if self.from_reducers.poll(wait):
-                act = self.from_reducers.recv()
-                self._exec_act(act)
+        def emitter_loop():
+            for ev in gen_src:
+                self._emit(ev)
+
+
+        emitter = Thread( 
+            target=emitter_loop
+        )
+        emitter.start()
+
+        while True:
+            act = self.from_reducers.recv()
+            self._exec_act(act)
+
         p.terminate()
         p.join()
+        emitter.join()
 
     def _emit(self,ev):
         self.to_reducers.send(ev)
