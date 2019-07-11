@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Welcome to ev-reduce’s documentation! &#8212; ev-reduce 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-ev-reduce-s-documentation">
+<h1>Welcome to ev-reduce’s documentation!<a class="headerlink" href="#welcome-to-ev-reduce-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>The framework is a flexible tool to define event sources, handlers of events,
+and produce an action from a handler</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Event source emits an event. Event = <cite>(type, event_data)</cite></p></li>
+<li><p>All reducers that listen to event <cite>type</cite> got called and passed <cite>(event, global_data)</cite>.</p></li>
+<li><p>The reducers map events to an action based on current data. they also modify data and return <cite>(action, data)</cite></p></li>
+<li><p>The action is <cite>(label, action_data)</cite>. It is passed to every action handler.</p></li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">test</span></code> for testing</p>
+</div>
+<div class="section" id="module-docs">
+<h2>Module docs<a class="headerlink" href="#module-docs" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="evv3.SyncModel">
+<em class="property">class </em><code class="sig-prename descclassname">evv3.</code><code class="sig-name descname">SyncModel</code><a class="headerlink" href="#evv3.SyncModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>This model is the very basic implemetation of ev-reduce api.
+The event generators are merged into a single generator
+and for every event a corresponding reducer is called.</p>
+<p>Everything is going on in a single thread</p>
+<dl class="method">
+<dt id="evv3.SyncModel.add_actor">
+<code class="sig-name descname">add_actor</code><span class="sig-paren">(</span><em class="sig-param">act</em><span class="sig-paren">)</span><a class="headerlink" href="#evv3.SyncModel.add_actor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an actor that will be called after every
+reducer rerturns an action</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>act</strong> (<em>callable</em>) – a callable that takes Action and returns None if                the action succeded. Otherviwse an ev-red.Error event                 will be fired with data returned</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="evv3.SyncModel.add_reducer">
+<code class="sig-name descname">add_reducer</code><span class="sig-paren">(</span><em class="sig-param">reducer</em>, <em class="sig-param">subscribe=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#evv3.SyncModel.add_reducer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a reducer that subscribes to events</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reducer</strong> (<em>callable</em>) – a callable that takes event and data        and returns action and modified data.</p></li>
+<li><p><strong>subscribe</strong> (<em>list</em>) – list of tokens that specify type of event                to which the reducer will be called</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="evv3.SyncModel.add_source">
+<code class="sig-name descname">add_source</code><span class="sig-paren">(</span><em class="sig-param">src</em><span class="sig-paren">)</span><a class="headerlink" href="#evv3.SyncModel.add_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a generator of events</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>src</strong> (<em>generator</em>) – a generator that yields an Event</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="evv3.SyncModel.start">
+<code class="sig-name descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#evv3.SyncModel.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start execution</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">ev-reduce</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Danil Lykov.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
