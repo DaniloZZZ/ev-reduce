@@ -1,9 +1,7 @@
 import evv3 as ev3
 import _sources as _src
 import _actors as _act
-
-ev = ev3.MprocModel()
-
+import _input_mock
 
 def reducer_cumsum(event, data):
     """ Parse int from the input then add to 'cumsum data' """
@@ -20,28 +18,42 @@ def reducer_cumsum(event, data):
 
     return ("SEND",f"Sum is {data['cumsum']}"), data
 
-@ev.reducer( subscribe=['stdin'] )
-def reducer_overflow(event, data):
-    data.setdefault('cumsum',0)
-    threshhold = 20
-    if data['cumsum'] > threshhold:
-        return ("OVERFLOW",""), data
+def test_counter():
+    _input_mock.sequence([
+        'hi','13','213','-214','hd'
+    ])
+    ev = ev3.MprocModel()
 
+    @ev.reducer( subscribe=['stdin'] )
+    def reducer_overflow(event, data):
+        data.setdefault('cumsum',0)
+        threshhold = 20
+        if data['cumsum'] > threshhold:
+            return ("OVERFLOW",""), data
 
-@ev.actor('ERROR')
-def err(act):
-    print("There was an error. Please enter text")
+    @ev.actor('ERROR')
+    def err(act):
+        print("There was an error. Please enter text")
 
-@ev.actor('OVERFLOW')
-def overf(act):
-    print("Overflow buddy:(")
+    @ev.actor('OVERFLOW')
+    def overf(act):
+        print("Overflow buddy:(")
 
-ev.actor('SEND')( _act.printer)
+    outputs=[]
+    ev.actor('SEND')( _act.printer_bound_to(outputs) )
 
-ev.source( _src.stdin )()
+    ev.source( _src.stdin )()
 
-# could use decorator too
-ev.add_reducer( reducer_cumsum , subscribe=['stdin'])
+    # could use decorator too
+    ev.add_reducer( reducer_cumsum , subscribe=['stdin'])
 
-ev.start()
+    ev.start()
+    print("<",outputs)
+    assert outputs == [
+        'Sum is 13',
+        'Sum is 226',
+        'Sum is 12',
+    ]
+
+    _input_mock.restore()
 

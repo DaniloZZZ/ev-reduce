@@ -23,6 +23,12 @@ class MprocModel:
         self.to_reducers, self.from_source = mpc.Pipe()
         self.from_reducers, self.to_actions = mpc.Pipe()
 
+        self.add_reducer(
+            lambda *x: (('_STOP',''),{})
+            ,subscribe=['_stop']
+        )
+        self.add_actor( '_STOP', lambda *x: '_cmd_stop')
+
     def add_source(self, src):
         """ Add a generator of events
 
@@ -108,6 +114,8 @@ class MprocModel:
         def emitter_loop():
             for ev in gen_src:
                 self._emit(ev)
+            print("#Emitter exited. Emitting stop signal")
+            self._emit(("_stop",''))
 
         emitter = Thread( 
             target=emitter_loop
@@ -116,7 +124,8 @@ class MprocModel:
 
         while True:
             act = self.from_reducers.recv()
-            self._exec_act(act)
+            result = self._exec_act(act)
+            if result=='_cmd_stop':break
 
         p.terminate()
         p.join()
@@ -129,11 +138,15 @@ class MprocModel:
         label = act[0]
         action = self.actors.get(label)
         if action is None:
-            print("Unknown label occured")
+            print("Unknown label occured:",label)
         else:
             result = action(act)
+            if result=='_cmd_stop':
+                print("evv3: got stop signal, returning")
+                return result
             if result is not None:
                 print("evv3: action returned an error", result)
+                return result
 
     def _dispatch(self,act):
         self.to_actions.send(act)

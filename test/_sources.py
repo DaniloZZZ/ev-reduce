@@ -2,9 +2,12 @@ import time
 
 def stdin():
     while True:
-        ev = ( 'stdin',
-            input('>')
-        )
+        try:
+            ev = ( 'stdin',
+                input('>')
+            )
+        except KeyboardInterrupt:
+            return
         yield ev
 
 def time():
