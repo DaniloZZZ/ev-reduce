@@ -1,4 +1,6 @@
 import evv3 as ev3
+import _sources as _src
+import _actors as _act
 
 ev = ev3.MprocModel()
 
@@ -25,29 +27,10 @@ def reducer_overflow(event, data):
     if data['cumsum'] > threshhold:
         return ("OVERFLOW",""), data
 
-@ev.actor
-def actor(action):
-    act_type = action[0]
-    if act_type=='ERROR':
-        print("There was an error. Please enter text")
+ev.actor( _act.actor )
 
-    elif act_type=='SEND':
-        print(action[1])
-    elif act_type=='OVERFLOW':
-        print("Overflow buddy:(")
-    else:
-        return -1
+ev.source( _src.stdin )()
 
-@ev.source
-def stdin_source():
-    while True:
-        ev = (
-            'stdin',
-            input('>')
-        )
-        yield ev
-
-stdin_source()
 
 # could use decorator too
 ev.add_reducer( reducer_cumsum , subscribe=['stdin'])
