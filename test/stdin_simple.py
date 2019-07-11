@@ -42,7 +42,7 @@ def actor(action):
         return -1
 
 
-ev = ev3.EvV3()
+ev = ev3.SyncModel()
 ev.add_source( stdin_source() )
 ev.add_actor( actor )
 
