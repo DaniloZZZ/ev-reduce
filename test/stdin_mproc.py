@@ -1,3 +1,4 @@
+import time
 import evv3 as ev3
 import _sources as _src
 import _actors as _act
@@ -21,7 +22,7 @@ def reducer_cumsum(event, data):
 def test_counter():
     _input_mock.sequence([
         'hi','13','213','-214','hd'
-    ]*10)
+    ]*1)
     ev = ev3.MprocModel()
 
     @ev.reducer( subscribe=['stdin'] )
@@ -56,4 +57,48 @@ def test_counter():
     ]
 
     _input_mock.restore()
+
+def test_async():
+    _input_mock.sequence([
+        'hi','13','213','-214','hd'
+    ]*1)
+    # try to change this to Mproc model
+    #ev = ev3.SyncModel()
+    ev = ev3.MprocModel()
+
+    @ev.reducer( subscribe=['stdin'] )
+    def reducer_overflow(event, data):
+        data.setdefault('cumsum',0)
+        threshhold = 20
+        if data['cumsum'] > threshhold:
+            return ("OVERFLOW",""), data
+
+    @ev.actor('ERROR')
+    def err(act):
+        print("There was an error. Please enter text")
+        print('_waiting...')
+        time.sleep(0.7)
+
+    @ev.actor('OVERFLOW')
+    def overf(act):
+        print("Overflow buddy:(")
+
+    outputs=[]
+    ev.actor('SEND')( _act.printer_bound_to(outputs) )
+
+    ev.source( _src.stdin )()
+    ev.source( _src.time_ )()
+
+    @ev.reducer(subscribe=['time'])
+    def reducer_time(ev,d):
+        return ("SEND",'time is:'+str(ev[1])), {'time':ev[1]}
+
+    # could use decorator too
+    ev.add_reducer( reducer_cumsum , subscribe=['stdin'])
+
+    ev.start()
+    #print("<",outputs)
+
+    _input_mock.restore()
+
 
