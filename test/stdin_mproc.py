@@ -62,7 +62,7 @@ def test_async():
     _input_mock.sequence([
         'hi','13','213','-214','hd'
     ]*1)
-    # try to change this to Mproc model
+    # try to change this to Sync model
     #ev = ev3.SyncModel()
     ev = ev3.MprocModel()
 
