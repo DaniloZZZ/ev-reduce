@@ -34,6 +34,7 @@ class MprocModel(BaseModel):
         p = mpc.Process(
             target=reducers_loop,
             args=(),
+            name='Reducer'
         )
         p.start()
 
@@ -47,7 +48,8 @@ class MprocModel(BaseModel):
             self._emit(("_stop",''))
 
         emitter = Thread( 
-            target=emitter_loop
+            target=emitter_loop,
+            name='Emitter'
         )
         emitter.start()
 
@@ -60,23 +62,3 @@ class MprocModel(BaseModel):
         p.terminate()
         p.join()
         emitter.join()
-
-    def _emit(self,ev):
-        self.to_reducers.send(ev)
-
-    def _exec_act(self,act):
-        label = act[0]
-        action = self.actors.get(label)
-        if action is None:
-            print("Unknown label occured:",label)
-        else:
-            result = action(act)
-            if result=='_cmd_stop':
-                print("evv3: got stop signal, returning")
-                return result
-            if result is not None:
-                print("evv3: action returned an error", result)
-                return result
-
-    def _dispatch(self,act):
-        self.to_actions.send(act)

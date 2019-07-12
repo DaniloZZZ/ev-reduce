@@ -1,3 +1,6 @@
+import logging as log
+from  .helpers import init_logging
+init_logging.init()
 
 class BaseModel:
     def __init__(self):
@@ -5,6 +8,7 @@ class BaseModel:
         self.reducers = {}
         self.actors = {}
         self.data = {}
+        self.logger = log.getLogger('base')
 
         self.add_reducer(
             lambda *x: (('_STOP',''),{})
@@ -70,11 +74,14 @@ class BaseModel:
         return decor
 
     def _emit(self,ev):
+        log.debug(f"Emitting event: {ev}")
         self.to_reducers.send(ev)
     def _dispatch(self,act):
+        log.debug(f"Dispatching action: {act}")
         self.to_actions.send(act)
 
     def _handle_ev(self, ev):
+        log.debug(f"New event: {ev}")
         t =  ev[0]
         reds = self.reducers.get(t,[])
         for r in reds:
@@ -88,16 +95,17 @@ class BaseModel:
 
 
     def _exec_act(self,act):
+        log.debug(f"Executing action: {act}")
         label = act[0]
         action = self.actors.get(label)
         if action is None:
-            print("Unknown label occured:",label)
+            log.warn(f"Unknown label occured: {label}")
         else:
             result = action(act)
             if result=='_cmd_stop':
-                print("evv3: got stop signal, returning")
+                log.info("Got stop signal, returning")
                 return result
             if result is not None:
-                print("evv3: action returned an error", result)
+                log.error(f"Action returned an error {result}")
                 return result
 
