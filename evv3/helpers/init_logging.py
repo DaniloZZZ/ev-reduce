@@ -8,4 +8,4 @@ def init():
         format = FORMAT,
         datefmt='%H:%M:%S'
     )
-init()
+

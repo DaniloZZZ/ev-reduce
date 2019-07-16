@@ -100,5 +100,3 @@ def test_async():
     #print("<",outputs)
 
     _input_mock.restore()
-
-

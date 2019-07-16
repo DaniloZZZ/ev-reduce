@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from os.path import join, dirname
 
 setup(
-    name='evv3',
+    name='ev_reduce',
     description='message handling framework',
     version='0.1',
     license='MIT',
