@@ -21,6 +21,5 @@ class listAPI:
     def on(self, name, action):
         self.subs[name] = action
 
-
     def get_actions(self):
         return self.act

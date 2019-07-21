@@ -11,7 +11,7 @@ setup(
     long_description=open(join(dirname(__file__), 'README.md')).read(),
     python_requires='>=3.7',
 
-    install_requires = ['pyzmq'],
+    install_requires = ['pyzmq', 'loguru'],
     setup_requires = ['pytest-runner'],
     tests_require  = ['pytest'],
 

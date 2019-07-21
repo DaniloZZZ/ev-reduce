@@ -1,4 +1,4 @@
-import evv3 as ev3
+import ev_reduce as ev3
 
 def ntest_stdin():
     def stdin_source():

@@ -9,3 +9,4 @@ def init():
         datefmt='%H:%M:%S'
     )
 
+log = logging

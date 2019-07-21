@@ -1,6 +1,4 @@
-import logging as log
-from  .helpers import init_logging
-init_logging.init()
+from  .helpers.logging import log
 
 class BaseModel:
     def __init__(self):

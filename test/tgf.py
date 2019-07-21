@@ -1,9 +1,8 @@
 import time
-import evv3 as ev3
 
 
 PREDS = {
-    'state.equals':
+    'state.equals':'a'
 }
 
 class Tgfv2:
