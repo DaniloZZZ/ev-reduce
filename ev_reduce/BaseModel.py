@@ -6,7 +6,7 @@ class BaseModel:
         self.reducers = {}
         self.actors = {}
         self.data = {}
-        self.logger = log.getLogger('base')
+        #self.logger = log.getLogger('base')
 
         self.add_reducer(
             lambda *x: (('_STOP',''),{})
