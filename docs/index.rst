@@ -33,6 +33,8 @@ Module docs
 .. autoclass:: evv3.SyncModel
     :members:
 
+.. autoclass:: evv3.BaseModel
+    :members:
 
 Indices and tables
 ==================
