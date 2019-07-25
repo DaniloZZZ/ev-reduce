@@ -30,10 +30,10 @@ run ``python setup.py test`` for testing
 Module docs
 -----------
 
-.. autoclass:: evv3.SyncModel
+.. autoclass:: ev_reduce.SyncModel
     :members:
 
-.. autoclass:: evv3.BaseModel
+.. autoclass:: ev_reduce.BaseModel
     :members:
 
 Indices and tables
