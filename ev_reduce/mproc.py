@@ -37,8 +37,16 @@ class MprocModel(BaseModel):
             name='Reducer'
         )
         p.start()
+        def concat(*gens):
+            while True:
+                for g in gens:
+                    try:
+                        print('yil')
+                        yield next(g)
+                    except StopIteration as e:
+                        continue
 
-        gen_src = chain(*self.sources)
+        gen_src = concat(*self.sources)
         def emitter_loop():
             for ev in gen_src:
                 self._emit(ev)
