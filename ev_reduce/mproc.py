@@ -3,6 +3,7 @@ from threading import Thread
 from itertools import chain
 import time
 
+from  .helpers.logging import log
 from .BaseModel import BaseModel
 
 def _pipe_reader(pipe_end):
@@ -22,6 +23,13 @@ class MprocModel(BaseModel):
         self.to_reducers, self.from_source = mpc.Pipe()
         self.from_reducers, self.to_actions = mpc.Pipe()
 
+    def _emit(self,ev):
+        log.debug(f"Emitting event: {ev}")
+        self.to_reducers.send(ev)
+    def _dispatch(self,act):
+        log.debug(f"Dispatching action: {act}")
+        self.to_actions.send(act)
+
     def start(self):
         """
         Start execution
@@ -37,36 +45,37 @@ class MprocModel(BaseModel):
             name='Reducer'
         )
         p.start()
-        def concat(*gens):
-            while True:
-                for g in gens:
-                    try:
-                        print('yil')
-                        yield next(g)
-                    except StopIteration as e:
-                        continue
 
-        gen_src = concat(*self.sources)
-        def emitter_loop():
-            for ev in gen_src:
-                self._emit(ev)
-                # allow other threads
-                time.sleep(0.)
-            print("#Emitter exited. Emitting stop signal")
-            self._emit(("_stop",''))
+        def get_emitter_loop(gen_src):
+            def loop():
+                for ev in gen_src:
+                    print('ev',ev)
+                    self._emit(ev)
+                    # allow other threads
+                    time.sleep(0.)
+                print("#Emitter exited. Emitting stop signal")
+                self._emit(("_stop",''))
+            return loop
 
-        emitter = Thread( 
-            target=emitter_loop,
-            name='Emitter'
-        )
-        emitter.start()
+        em_threads = []
+        for gen in self.sources:
+            loop = get_emitter_loop(gen)
 
-        while True:
+            em_thread = Thread(
+                target=loop,
+                name='Emitter'
+            )
+            em_thread.start()
+            em_threads.append( em_thread )
+
+        while sum([t.is_alive() for t in em_threads]) !=0:
             act = self.from_reducers.recv()
             result = self._exec_act(act)
             time.sleep(0)
-            if result=='_cmd_stop':break
+            #if result=='_cmd_stop':break
+        print("Everything ended")
 
         p.terminate()
         p.join()
-        emitter.join()
+        for thr in em_threads:
+            thr.join()

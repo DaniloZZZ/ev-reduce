@@ -20,6 +20,7 @@ def reducer_cumsum(event, data):
     return ("SEND",f"Sum is {data['cumsum']}"), data
 
 def test_counter():
+    return
     _input_mock.sequence([
         'hi','13','213','-214','hd'
     ]*1)
@@ -59,6 +60,7 @@ def test_counter():
     _input_mock.restore()
 
 def test_async():
+    #return
     _input_mock.sequence([
         'hi','13','213','-214','hd'
     ]*1)
@@ -88,6 +90,8 @@ def test_async():
 
     ev.source( _src.stdin )()
     ev.source( _src.time_ )()
+    ev.source( _src.time_ )(delay=1)
+    print(0, ev.sources)
 
     @ev.reducer(subscribe=['time'])
     def reducer_time(ev,d):

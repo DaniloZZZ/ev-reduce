@@ -10,11 +10,11 @@ def stdin():
             return
         yield ev
 
-def time_():
+def time_(delay=0.3, duration=3):
     start = time.time()
     while True:
         now = time.time()
         ev = ( 'time',now-start)
-        if now-start >2: return
+        if now-start > duration: return
         yield ev
-        time.sleep(0.3)
+        time.sleep(delay)

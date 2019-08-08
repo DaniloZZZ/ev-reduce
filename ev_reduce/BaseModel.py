@@ -8,6 +8,7 @@ class BaseModel:
         self.data = {}
         #self.logger = log.getLogger('base')
 
+        #TODO: this should be removed, but need some work to not cause a deadlock
         self.add_reducer(
             lambda *x: (('_STOP',''),{})
             ,subscribe=['_stop']
@@ -72,11 +73,9 @@ class BaseModel:
         return decor
 
     def _emit(self,ev):
-        log.debug(f"Emitting event: {ev}")
-        self.to_reducers.send(ev)
+        raise NotImplementedError
     def _dispatch(self,act):
-        log.debug(f"Dispatching action: {act}")
-        self.to_actions.send(act)
+        raise NotImplementedError
 
     def _handle_ev(self, ev):
         log.debug(f"New event: {ev}")
@@ -101,7 +100,7 @@ class BaseModel:
         else:
             result = action(act)
             if result=='_cmd_stop':
-                log.info("Got stop signal, returning")
+                log.info("Got stop signal")
                 return result
             if result is not None:
                 log.error(f"Action returned an error {result}")
